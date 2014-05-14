@@ -23,7 +23,7 @@ func DoAndCreateFile(client *http.Client, request *http.Request, filename string
 	if err != nil {
 		return nil, nil, err
 	}
-	response, err := DondAppendToWriter(client, request, file)
+	response, err := DoAndAppendToWriter(client, request, file)
 	if err != nil {
 		file.Close()
 		return nil, nil, err
