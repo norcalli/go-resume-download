@@ -55,7 +55,7 @@ func DoAndAppendToWriter(client *http.Client, request *http.Request, file *os.Fi
 	if err != nil {
 		return nil, err
 	} else {
-		request.Header.Add("Range", fmt.Sprintf("bytes=%d-", fileSize))
+		request.Header.Set("Range", fmt.Sprintf("bytes=%d-", fileSize))
 	}
 	response, err := client.Do(request)
 	if err != nil {
@@ -77,26 +77,27 @@ func GetAndAppendToWriter(client *http.Client, url string, file *os.File) (*http
 	if err != nil {
 		return nil, err
 	}
-	// Assert that the file is at the end and get fileSize at the same time.
-	fileSize, err := file.Seek(0, 2)
-	if err != nil {
-		return nil, err
-	}
-	if err != nil {
-		return nil, err
-	} else {
-		request.Header.Add("Range", fmt.Sprintf("bytes=%d-", fileSize))
-	}
-	response, err := client.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: How to handle stuff that doesn't accept ranges?
-	// if response.StatusCode != 206 {
-	if response.Header.Get("Accept-Ranges") == "" {
-		response.Body.Close()
-		// file.Seek(0, 0)
-		return nil, errors.New("Url doesn't accept Ranges (resuming download).")
-	}
-	return response, nil
+	return DoAndAppendToWriter(client, request, file)
+	// // Assert that the file is at the end and get fileSize at the same time.
+	// fileSize, err := file.Seek(0, 2)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if err != nil {
+	// 	return nil, err
+	// } else {
+	// 	request.Header.Set("Range", fmt.Sprintf("bytes=%d-", fileSize))
+	// }
+	// response, err := client.Do(request)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// // TODO: How to handle stuff that doesn't accept ranges?
+	// // if response.StatusCode != 206 {
+	// if response.Header.Get("Accept-Ranges") == "" {
+	// 	response.Body.Close()
+	// 	// file.Seek(0, 0)
+	// 	return nil, errors.New("Url doesn't accept Ranges (resuming download).")
+	// }
+	// return response, nil
 }
